@@ -48,20 +48,20 @@ def trainCellEmbeddings(Graph,Seed=0,Workers=1):
     emb=Cell_node2vec.get_embeddings(tmodel)
     return emb
 
-def imputation(scfile,embeddingfile,AdjGraph):
+def imputation(mbfile,embeddingfile,AdjGraph):
     prediction_distance=pairwise_distances(embeddingfile.T,n_jobs=5,metric="euclidean")
     adj_matrix_merge=np.array(AdjGraph)
     for j in range(adj_matrix_merge.shape[0]):
         adj_matrix_merge[np.argsort(prediction_distance[:,j])[0:np.sum(adj_matrix_merge[:,j]==1)],j]=1
-    np_scfile=np.array(scfile)
-    imputation_file=np.array(scfile)
-    if len(scfile.columns) > 500:
+    np_mbfile=np.array(mbfile)
+    imputation_file=np.array(mbfile)
+    if len(mbfile.columns) > 500:
         for k in range(adj_matrix_merge.shape[1]):
-            imputation_file[np.where(imputation_file[:,k]==0)[0],k] = np.mean(np_scfile[:,np.where(adj_matrix_merge[:,k]==1)[0]][np.where(imputation_file[:,k]==0)[0],:],axis=1)
+            imputation_file[np.where(imputation_file[:,k]==0)[0],k] = np.mean(np_mbfile[:,np.where(adj_matrix_merge[:,k]==1)[0]][np.where(imputation_file[:,k]==0)[0],:],axis=1)
     else:
         for k in range(adj_matrix_merge.shape[1]):
-            imputation_file[np.where(imputation_file[:,k]==0)[0],k] = np.median(np_scfile[:,np.where(adj_matrix_merge[:,k]==1)[0]][np.where(imputation_file[:,k]==0)[0],:],axis=1)
+            imputation_file[np.where(imputation_file[:,k]==0)[0],k] = np.median(np_mbfile[:,np.where(adj_matrix_merge[:,k]==1)[0]][np.where(imputation_file[:,k]==0)[0],:],axis=1)
     df_imputation=pd.DataFrame(imputation_file)
-    df_imputation.columns=scfile.columns.tolist()
-    df_imputation.index=scfile.index.tolist()
+    df_imputation.columns=mbfile.columns.tolist()
+    df_imputation.index=mbfile.index.tolist()
     return df_imputation
