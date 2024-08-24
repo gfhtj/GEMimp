@@ -43,7 +43,7 @@ def GraphBuild(input_file,k=3):
 
 def trainCellEmbeddings(Graph,Seed=0,Workers=1):
     G = nx.from_pandas_adjacency(Graph)
-    Cell_node2vec = Node2Vec(G,dimensions=128,p=4,q=2, walk_length=5, num_walks=20, workers=Workers,seed=Seed)
+    Cell_node2vec = Node2Vec(G,dimensions=128,p=4,q=0.25, walk_length=5, num_walks=20, workers=Workers,seed=Seed)
     tmodel=Cell_node2vec.fit(window=3, epochs=3)
     emb=Cell_node2vec.get_embeddings(tmodel)
     return emb
