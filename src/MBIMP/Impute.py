@@ -41,9 +41,9 @@ def GraphBuild(input_file,k=3):
     adj_df.columns=input_file.columns.tolist()
     return adj_df
 
-def trainCellEmbeddings(Graph,Seed=0,Workers=1):
+def trainCellEmbeddings(Graph,Seed=0,Workers=1,P=4,Q=0.25):
     G = nx.from_pandas_adjacency(Graph)
-    Cell_node2vec = Node2Vec(G,dimensions=128,p=4,q=0.25, walk_length=5, num_walks=20, workers=Workers,seed=Seed)
+    Cell_node2vec = Node2Vec(G,dimensions=128,p=P,q=Q, walk_length=5, num_walks=20, workers=Workers,seed=Seed)
     tmodel=Cell_node2vec.fit(window=3, epochs=3)
     emb=Cell_node2vec.get_embeddings(tmodel)
     return emb
@@ -55,7 +55,7 @@ def imputation(mbfile,embeddingfile,AdjGraph):
         adj_matrix_merge[np.argsort(prediction_distance[:,j])[0:np.sum(adj_matrix_merge[:,j]==1)],j]=1
     np_mbfile=np.array(mbfile)
     imputation_file=np.array(mbfile)
-    if len(mbfile.columns) > 500:
+    if len(mbfile.columns) > 200:
         for k in range(adj_matrix_merge.shape[1]):
             imputation_file[np.where(imputation_file[:,k]==0)[0],k] = np.mean(np_mbfile[:,np.where(adj_matrix_merge[:,k]==1)[0]][np.where(imputation_file[:,k]==0)[0],:],axis=1)
     else:
