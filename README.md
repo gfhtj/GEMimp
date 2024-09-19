@@ -3,4 +3,5 @@ GEMimp is an imputation method for microbiome data based on graph embeddings.
 
 Overall workflow of GEMimp algorithm pipeline
 
-<img width="747" alt="figure1修改" src="https://github.com/user-attachments/assets/3e7cba9e-751a-45f0-b34f-51ccc7082471">
+![Figure 1订正](https://github.com/user-attachments/assets/8e0f35e4-5a45-4578-a115-23f86735ae12)
+
