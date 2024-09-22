@@ -1,6 +1,12 @@
 ###########zero-inflated data###################
+logdata0915_2 <- read.csv( 'D"/GEMimp/raw_file.csv',row.names = 1) #170*469
+rawdata0915_2 <- floor(10^logdata0915_2-1.01) 
+rawdata0915_2[rawdata0915_2 == -1] = 0
+
+non_zero_log_counts_2 <- logdata0915_2 != log10(1.01)
+non_zero_proportions_2 <- colSums(non_zero_log_counts_2) / nrow(rawdata0915_2)
 # Calculate the non-zero average abundance
-non_zero_means_2000_2 <- apply(logdata2000_2, 2, function(x) {
+non_zero_means_0915_2 <- apply(logdata0915_2, 2, function(x) {
   # Exclude log10(1.01) non-zero values
   non_zero_values <- x[x != log10(1.01)]
   # If there are non-zero values, calculate the mean; otherwise return 0
@@ -10,30 +16,19 @@ non_zero_means_2000_2 <- apply(logdata2000_2, 2, function(x) {
     0
   }
 })
-
 # Check for NA values
-na_check <- any(is.na(non_zero_means_2000_2))
+na_check <- any(is.na(non_zero_means_0915_2))
 print(na_check)
 
-# If necessary, replace NA values with 0
-non_zero_means_2000_2[is.na(non_zero_means_2000_2)] <- 0
-# Calculate the adjusted probability of imputing 0, zj
-zj_adjusted_2000_2 <- 1 - non_zero_proportions_2000_2 / (non_zero_means_2000_2 + 1)
-any(is.na(zj_adjusted_2000_2))
-# Ensure zj is between 0 and 1
-zj_adjusted_2000_2 <- pmin(pmax(zj_adjusted_2000_2, 0), 1)
-any(is.na(zj_adjusted_2000_2))
-# Generate a binomial distribution Iij
-set.seed(123)
-Iij_adjusted_2000_2 <- matrix(rbinom(n = nrow(simudata2000_2) * ncol(simudata2000_2), size = 1, prob = zj_adjusted_2000_2), 
-                              nrow = nrow(simudata2000_2), ncol = ncol(simudata2000_2))
-# Check for NA values
-if (any(is.na(Iij_adjusted_2000_2))) {
-  warning("Iij_adjusted_2000_2 contains NA values")
-  #zj_adjusted_2000_2[is.na(zj_adjusted_2000_2)] <- 0 
-}
+zj_adjusted_2 <- 1 - (1-non_zero_proportions_2) / (non_zero_means_2 + 1)
+zj_adjusted_2 <- pmin(pmax(zj_adjusted_2, 0), 1)
+
+set.seed(1234)
+Iij_adjusted_2 <- matrix(rbinom(n = nrow(rawdata0915_2) * ncol(rawdata0915_2), size = 1, prob = zj_adjusted_2), 
+                         nrow = nrow(rawdata0915_2), ncol = ncol(rawdata0915_2))
+
 # Multiply Iij by the log-transformed matrix to impute 0s
-filled_logdata_adjusted_2000_2 <- logdata2000_2 * Iij_adjusted_2000_2
+filled_logdata_adjusted_2 <- logdata0915_2 * Iij_adjusted_2
 
 
 
